@@ -1,67 +1,136 @@
-void makeDungeon2() {
-  char areaSX[6] = {}, areaSY[6] = {}, areaEX[6] = {}, areaEY[6] = {};
-  char root[2] = {};
-  char doorX[2] = {}, doorY[2];
-  int pass[7] = {1, 1, 1, 1, 1, 1, 1};
-  int passstat = 0;
-  int temp[2] = {};
-  int dr, fm, to, ro;
+void makeDungeon2()
+{
+	char root[2] = {};
+	char doorX[2] = {}, doorY[2];
+	int pass[7] = {1, 1, 1, 1, 1, 1, 1};
+	int passstat = 0;
+	int dr, fm, to, ro;
 
-  for(int i=0; i<6; i++){
-    hasRoom[i]=0;
-  }
-//縦に３分割する  
-  for (int i = 0; i < 7; i++) {
-    int r = random(3);
-    switch (r) {
-      case 0:
-        temp[0]++;
-        break;
-      case 1:
-        temp[1]++;
-        break;
-      case 2:
-        break;
-    }
-  }
-  int r1 = temp[0] + 4;
-  int r2 = temp[1] + 4;
-//横に２分割する
-  int r3 = random(6) + 1;
-  areaSX[0] = 0; areaSY[0] = 0; areaEX[0] = r1 - 1; areaEY[0] = r3; if (r3 >= 3) hasRoom[0] = 1;
-  areaSX[1] = 0; areaSY[1] = r3 + 1; areaEX[1] = r1 - 1; areaEY[1] = 7; if ((7 - r3) >= 4) hasRoom[1] = 1;
-  if (r3 == 3) { pass[0] = 0; passstat=passstat + 1; }
-  root[0] = r1;
-  int r4 = random(6) + 1;
-  areaSX[2] = r1 + 1; areaSY[2] = 0; areaEX[2] = r1 + r2; areaEY[2] = r4; if (r4 >= 3) hasRoom[2] = 1;
-  areaSX[3] = r1 + 1; areaSY[3] = r4 + 1; areaEX[3] = r1 + r2; areaEY[3] = 7; if ((7 - r4) >= 4) hasRoom[3] = 1;
-  if (r4 == 3) { pass[3] = 0; passstat= passstat+2; }
-  root[1] = r1 + r2 + 1;
-  int r5 = random(6) + 1;
-  areaSX[4] = r1 + r2 + 2; areaSY[4] = 0; areaEX[4] = 20; areaEY[4] = r5; if (r5 >= 3) hasRoom[4] = 1;
-  areaSX[5] = r1 + r2 + 2; areaSY[5] = r5 + 1; areaEX[5] = 20; areaEY[5] = 7; if ((7 - r5) >= 4) hasRoom[5] = 1;
-  if (r5 == 3) { pass[6] = 0; passstat=passstat+4; }
-//部屋間の通路を減らす
-  if (passstat == 0) {
-    if (random(2) == 0) {
-      pass[random(4)] = 0;
-    }
-    if (random(2) == 0) {
-      pass[random(3) + 4] = 0;
-    }
-  } else if( passstat==1 ){
-    if (random(2) == 0) {
-      pass[random(3) + 4] = 0;
-    }
-  } else if( passstat==2 ){
-    if (random(2) == 0) {
-      pass[random(7)] = 0;
-    }
-  } else if( passstat==4 ){
-    if (random(2) == 0) {
-      pass[random(4)] = 0;
-    }
-  }
+	for(size_t i = 0; i < (RMAX*2);++i)
+	{
+		hasRoom[i]=0;
+	}
+
+	//縦に３分割する
+	int temp0 = 0;
+	int temp1 = 0;
+
+	for (uint8_t i = 0; i < 7; ++i)
+	{
+		uint8_t r = random(3);
+		switch (r)
+		{
+			case 0:
+				++temp0;
+				break;
+			case 1:
+				++temp1;
+				break;
+			case 2:
+				break;
+		}
+	}
+
+	int r1 = temp0 + 4;
+	int r2 = temp1 + 4;
+
+	//横に２分割する
+	int r3 = random(6) + 1;
+	char areaSX[6] = {}, areaSY[6] = {}, areaEX[6] = {}, areaEY[6] = {};
+	
+	areaSX[0] = 0;
+	areaSY[0] = 0;
+	areaEX[0] = r1 - 1;
+	areaEY[0] = r3;
+	if (r3 >= 3)
+		hasRoom[0] = 1;
+		
+	areaSX[1] = 0;
+	areaSY[1] = r3 + 1;
+	areaEX[1] = r1 - 1;
+	areaEY[1] = 7;
+	if ((7 - r3) >= 4)
+		hasRoom[1] = 1;
+		
+	if (r3 == 3)
+	{
+		pass[0] = 0;
+		++passstat;
+	}
+	
+	root[0] = r1;
+	
+	int r4 = random(6) + 1;
+	areaSX[2] = r1 + 1;
+	areaSY[2] = 0;
+	areaEX[2] = r1 + r2;
+	areaEY[2] = r4;
+	
+	if (r4 >= 3)
+		hasRoom[2] = 1;
+	
+	areaSX[3] = r1 + 1;
+	areaSY[3] = r4 + 1;
+	areaEX[3] = r1 + r2;
+	areaEY[3] = 7;
+	
+	if ((7 - r4) >= 4)
+		hasRoom[3] = 1;
+		
+	if (r4 == 3)
+	{
+		pass[3] = 0;
+		passstat += 2;
+	}
+	
+	root[1] = r1 + r2 + 1;
+	
+	int r5 = random(6) + 1;
+	areaSX[4] = r1 + r2 + 2;
+	areaSY[4] = 0;
+	areaEX[4] = 20;
+	areaEY[4] = r5;
+	
+	if (r5 >= 3)
+		hasRoom[4] = 1;
+		
+	areaSX[5] = r1 + r2 + 2;
+	areaSY[5] = r5 + 1;
+	areaEX[5] = 20;
+	areaEY[5] = 7;
+	
+	if ((7 - r5) >= 4)
+		hasRoom[5] = 1;
+		
+	if (r5 == 3)
+	{
+		pass[6] = 0;
+		passstat += 4;
+	}
+	
+	//部屋間の通路を減らす
+	switch(passstat)
+	{
+		case 0:
+			if (random(2) == 0)
+				pass[random(4)] = 0;
+			if (random(2) == 0)
+				pass[random(3) + 4] = 0;
+			break;
+		case 1:
+			if (random(2) == 0)
+				pass[random(3) + 4] = 0;
+			break;
+		case 2:
+			if (random(2) == 0)
+				pass[random(7)] = 0;
+			break;
+		case 4:
+			if (random(2) == 0)
+				pass[random(4)] = 0;
+			break;
+	}
+  
 //部屋の大きさを決める
   for (int i = 0; i <= 5; i++) {
     if (hasRoom[i] == 1) {

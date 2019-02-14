@@ -1,10 +1,10 @@
 void eat(byte r) {
   if (r == 0 && random(3) == 0) {
-    mess(7);
+    setActiveMessage(7);
     hh = hh / 3 + 700 + random(200);
     ex = ex + 2;
   } else {
-    mess(8);
+    setActiveMessage(8);
     hh = hh / 3 + 900 + random(200);
   }
 }
@@ -12,36 +12,36 @@ void eat(byte r) {
 void wield(byte r) {
   if (bitRead(i4[r], 4) == 1) {
     if (bitRead(i4[r], 6) == 1) {
-      mess(9);            // cursed
+      setActiveMessage(9);            // cursed
     } else {
       bitWrite(i4[r], 4, 0);
-      mess(10);           //remove
+      setActiveMessage(10);           //remove
       if(ii[r]/16==7) ringPut(r,-1);
     }
   } else {
     switch (ii[r] / 16) {
       case 3:
         if (equip(3, 1) != 0) {
-          mess(12);       //already wield
+          setActiveMessage(12);       //already wield
         } else {
           bitWrite(i4[r], 4, 1);
-          mess(11);       //ready go
+          setActiveMessage(11);       //ready go
         }
         break;
       case 4:
         if (equip(4, 1) != 0) {
-          mess(12);
+          setActiveMessage(12);
         } else {
           bitWrite(i4[r], 4, 1);
-          mess(11);
+          setActiveMessage(11);
         }
         break;
       case 7:
         if (equip(7, 1)*equip(7, 2) != 0) {
-          mess(12);
+          setActiveMessage(12);
         } else {
           bitWrite(i4[r], 4, 1);
-          mess(11);
+          setActiveMessage(11);
           ringPut(r,1);
         }
         break;
@@ -131,8 +131,8 @@ void drink(byte r) {
 }
 
 void readScroll(byte r) {
-  byte ex = 0, i = 0, st, dx,dy;
-  int fp;
+  byte ex = 0, i = 0, st = 0, dx = 0, dy = 0;
+  int fp = 0;
   switch (stab[r]) {
     case 0:       //protect
       st=equip(4,1);
@@ -182,7 +182,6 @@ void readScroll(byte r) {
         bitWrite(wknow, ii[st] % 16, 1);
       }
       itmToGitm(ii[st]/16, ii[st]%16, 1);
-      addBuf(gitm);
       break;
     case 5:       //telport
       teleportHero();
@@ -247,7 +246,7 @@ void zap(byte vari){
 
 byte equip(byte type, byte n) {     //type=3(weapon),4(armor),7(ring), n=1 or 2(for ring)...rtab[equip(7,2)]
   byte result = 0;
-  for (int i = 0; i < 20; i++) {
+  for (uint8_t i = 0; i < 20; i++) {
     if (ii[i] / 16 == type) {
       if (bitRead(i4[i], 4) == 1) {
         n--;
@@ -275,80 +274,76 @@ byte hasRing(byte vari) {
   return result;
 }
 
-int checkHit(byte dir, byte str){
-  char dx = (dir - 2) * (dir % 2);
-  char dy = (dir - 3) * ((dir - 1) % 2);
-  byte ex=0, i=0;
-  byte mon=0;
-  byte x=hx, y=hy;
-  do{
-    if(monst[x+dx][y+dy] != 0){
-      mon = monst[x+dx][y+dy];
-      x=x+dx;
-      y=y+dy;
-      ex=1;
-    } else if(dungeon[x+dx][y+dy]==0 || dungeon[x+dx][y+dy]>=41){
-      ex=1;
-    } else {
-      x=x+dx;
-      y=y+dy;
-      i++;
-      if(i==str) ex=1;
-    }
-  } while (ex==0);
-  return mon*256 + y*21 + x;
+int checkHit(uint8_t dir, uint8_t str)
+{
+	uint8_t dx = (dir - 2) * (dir % 2);
+	uint8_t dy = (dir - 3) * ((dir - 1) % 2);
+
+	uint8_t mon = 0;
+	uint8_t x = hx;
+	uint8_t y = hy;
+
+	for(uint8_t i = 0; i != str; ++i)
+	{
+		if(monst[x+dx][y+dy] != 0)
+		{
+			mon = monst[x + dx][y + dy];
+			x += dx;
+			y += dy;
+			break;
+		}
+
+		if((dungeon[x + dx][y + dy] == 0) || (dungeon[x + dx][y + dy] >= 41))
+		{
+			break;
+		}
+		
+		x += dx;
+		y += dy;
+	}
+	
+	return (mon * 256) + (y * 21) + x;
 }
 
-byte findPlace(byte x, byte y){
-  byte result=0;
-  byte ex=0, i=0, r=random(8);
-  if(thing[x][y]==0){
-    result=5;
-    ex=1;
-  } else {
-    do{
-      char st=(i+r)%9;
-      char dx=st%3-1;
-      char dy=st/3-1;
-      if(dungeon[x+dx][y+dy]>=1 && dungeon[x+dx][y+dy]<=36 && thing[x+dx][y+dy]==0){
-        result=st + 1;
-        ex=1;
-      } else {
-        i++;
-        if(i==9){
-          ex=1;
-        }
-      }
-    } while (ex==0);
-  }
-  return result;
+uint8_t findPlace(uint8_t x, uint8_t y)
+{
+  	if(thing[x][y] == 0)
+		return 5;
+
+	uint8_t r = random(8);
+
+	for(uint8_t i = 0; i < 9; ++i)
+	{
+		char st = (i + r) % 9;
+		char dx = (st % 3) - 1;
+		char dy = (st / 3) - 1;
+		
+		if((dungeon[x+dx][y+dy] >= 1) && (dungeon[x+dx][y+dy] <= 36) && (thing[x+dx][y+dy] == 0))
+			return (st + 1);
+	}
+
+	return 0;
 }
 
-byte findPlaceM(byte x, byte y){
-  byte result=0;
-  byte ex=0, i=0, r=random(8);
-/*
-  if(thing[x][y]==0){
-    result=5;
-    ex=1;
-  } else {
-*/
-    do{
-      char st=(i+r)%9;
-      char dx=st%3-1;
-      char dy=st/3-1;
-      if((abs(dx)+abs(dy)) != 0 && dungeon[x+dx][y+dy]>=1 && dungeon[x+dx][y+dy]<=36 && monst[x+dx][y+dy]==0){
-        result=st + 1;
-        ex=1;
-      } else {
-        i++;
-        if(i==9){
-          ex=1;
-        }
-      }
-    } while (ex==0);
-//  }
-  Serial.println(result);
-  return result;
+uint8_t findPlaceM(uint8_t x, uint8_t y)
+{
+	uint8_t result = 0;
+	uint8_t r = random(8);
+  
+	for(uint8_t i = 0; i < 9; ++i)
+	{
+		uint8_t st = (i + r) % 9;
+		uint8_t dx = (st % 3) - 1;
+		uint8_t dy = (st / 3) - 1;
+
+		if(((dx + dy) != 0) && (dungeon[x + dx][y + dy] >= 1) && (dungeon[x + dx][y + dy] <= 36) && (monst[x + dx][y + dy] == 0))
+		{
+			result = st + 1;
+			break;
+		}
+	}
+
+	Serial.println(result);
+	return result;
 }
 

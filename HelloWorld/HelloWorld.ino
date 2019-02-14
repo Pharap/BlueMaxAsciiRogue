@@ -2,7 +2,7 @@
 #define ARMAX   7     //8
 #define POMAX   14    //14
 #define SCMAX   12    //14
-#define RGMAX   11    //14
+#define RGMAX   12    //14
 #define WDMAX   10    //14
 #define RMAX    2
 #define IMAX    26
@@ -11,54 +11,6 @@
 
 #include <Arduboy2.h>
 Arduboy2 arduboy;
-
-const char gold[1][8] PROGMEM = {
-  "gold"
-};
-const char food[2][8] PROGMEM = {
-  "food",  "mold"
-};
-const char weapon[WEMAX][8] PROGMEM = {
-  "mace",  "axe",  "sword", "bow",  "dart",  "arrow",  "shriken", "dagger"
-};
-const char armor[ARMAX][8] PROGMEM = {
-  "leather",  "ring", "scale",  "chain",  "splint",   "banded",   "plate"
-};
-const char color[POMAX][8] PROGMEM = {
-  "amber",  "black",  "blue", "brown",  "clear",  "cyan",   "gold",   "green",
-  "gray",   "pink",   "red",  "vioret", "white",  "yellow"
-};
-const char label[SCMAX][8] PROGMEM = {
-  "ZELGO",  "JUYED",  "NR 9",  "XIXAXA",  "DAIYEN",  "ELBIB",  "THARR",  "YUM YUM",
-  "ANDOVA",  "FOOBIE",  "TEMOV",  "READ ME"
-};
-const char stone[RGMAX][8] PROGMEM = {
-  "agate",  "amthyst", "diamond",  "emerald",  "garnet", "onix", "opal",   "pearl",
-  "ruby",     "saphire",  "topaz"
-};
-const char metal[WDMAX][8] PROGMEM = {
-  "brass",    "bronze",   "copper",     "iron",   "lead", "nickel", "steel", "silver",
-  "tin",      "zinc"
-};
-const char potion[POMAX][8] PROGMEM = {
-  "power",  "restore",  "heal",   "e.heal",    "poison",     "level",   "blind",   "hallu",
-  "m.dtect",    "i.dtect", "confuse",    "levtate",  "speed",    "look"
-};
-const char scroll[SCMAX][8] PROGMEM = {
-  "protect",    "hold",     "weapon",    "armor",    "idntify",  "telport", "sleep",  "scare", 
-  "bless",   "create",    "anger",    "map"
-};
-const char ring[RGMAX][8] PROGMEM = {
-  "stealth",  "telport",  "life", "food",   "damage",     "strong",  "dex",
-  "ardorn",   "see",   "armor", "search"
-};
-const char wand[WDMAX][8] PROGMEM = {
-  "telport",  "slow",  "confuse",  "clear", "change", "fast",  "sleep",  "missile",
-  "cancel",   "nothing"
-};
-const char amulet[1][8] PROGMEM = {
-  "Yendor"
-};
 
 const char tsym[9] PROGMEM = {'*', ':', ')', '[', '!', '?', '=', '/', ','};
 const char tprob[9] PROGMEM = {0, 10, 15, 24, 33, 63, 93, 96, 100};
@@ -134,7 +86,7 @@ byte id[TMAX] = {}, t1[TMAX] = {}, t4[TMAX] = {};
 byte ii[IMAX] = {}, i1[IMAX] = {}, i4[IMAX] = {};
 byte fi = 0, f1 =0, f4=0;
 char t2[TMAX] = {}, t3[TMAX] = {};
-char i2[IMAX] = {}, i3[IMAX] = {};
+byte i2[IMAX] = {}, i3[IMAX] = {};
 char f2 = 0, f3 =0;
 byte ptab[POMAX] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 byte stab[SCMAX] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
@@ -143,36 +95,13 @@ byte wtab[WDMAX] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 unsigned int pknow = 0, sknow = 0, rknow = 0, wknow = 0;
 //char buf[21];
 
-char gbuf[22];
-char gmon[10];
-char gitm[8];
-char gmes[15];
+#include "FlashStringHelper.h"
 
-const char mes[22][15] PROGMEM = {
-  // 0123456789012345
-  "you hit ",         //0
-  "you miss ",        //1
-  "no space",         //2
-  "something here",   //3
-  "no slot",          //4
-  "dir?",             //5
-  "level up",         //6
-  "Oops...",          //7
-  "Yummy",            //8
-  "it cursed",        //9
-  "removed",          //10
-  "ready go",         //11
-  "alread wield",     //12
-  "frozen",           //13
-  "poisoned",         //14
-  "stolen",           //15
-  "water",            //16
-  "held",             //17
-  "graced",           //18
-  "burned",           //19
-  "level down",       //20
-  "drained"           //21
-};
+FlashStringHelper activeMessage = nullptr;
+//char gbuf[22];
+char gmon[10];
+//char gitm[8];
+char gmes[15];
 
 byte gstate = 0;
 

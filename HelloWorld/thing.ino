@@ -40,20 +40,23 @@ byte randScroll() {
   return count;
 }
 
-byte freeSlot() {
-  byte done = 0;
-  byte count = 0;
-  while (done == 0) {
-    if ( id[count] == 0 ) {
-      done = 1;
-    } else {
-      count++;
-      if (count == TMAX) {
-        done = 1;
-      }
-    }
-  }
-  return count;
+byte freeSlot()
+{
+	for(byte i = 0; i < TMAX; ++i)
+	{
+		if (id[i] == 0)
+		{
+			return i;
+		}
+	}
+	return TMAX;
+}
+
+byte swap(byte & left, byte & right)
+{
+	byte temporary = left;
+	left = right;
+	right = temporary;
 }
 
 byte sortItem() {
@@ -66,21 +69,25 @@ byte sortItem() {
   }
   for (int i = 0; i < IMAX; ++i) {
     for (int j = i + 1; j < IMAX; ++j) {
-      if (ii[i] > ii[j]) {
+      if (ii[i] > ii[j]) {	  
         byte tmp1 =  ii[i];
-        byte tmp2 =  i1[i];
-        byte tmp3 =  i2[i];
-        byte tmp4 =  i3[i];
-        byte tmp5 =  i4[i];
         ii[i] = ii[j];
-        i1[i] = i1[j];
-        i2[i] = i2[j];
-        i3[i] = i3[j];
-        i4[i] = i4[j];
         ii[j] = tmp1;
+				
+        byte tmp2 =  i1[i];
+        i1[i] = i1[j];
         i1[j] = tmp2;
+		
+        byte tmp3 =  i2[i];
+        i2[i] = i2[j];
         i2[j] = tmp3;
+		
+        byte tmp4 =  i3[i];
+        i3[i] = i3[j];
         i3[j] = tmp4;
+		
+        byte tmp5 =  i4[i];
+        i4[i] = i4[j];		
         i4[j] = tmp5;
       }
     }
@@ -113,12 +120,12 @@ void dropItem(byte x, byte y, byte st) {
       */
     } else if (thing[x][y] != 0) {
       //    msgc = "something here";
-      mess(3);
+      setActiveMessage(3);
     } else {
       byte t = freeSlot();
       if (t == TMAX) {
         //      msgc = "no slot";
-        mess(4);
+        setActiveMessage(4);
       } else {
         thing[x][y] = t + 1;
         id[t] = ii[st];
@@ -130,7 +137,7 @@ void dropItem(byte x, byte y, byte st) {
       }
     }
   } else {
-    mess(12);
+    setActiveMessage(12);
   }
 }
 
@@ -155,7 +162,6 @@ void useItem(byte st) {
     }
     drink(vari);
     itmToGitm(5, vari, 1);
-    addBuf(gitm);
   } else if (kind == 6) {     //scroll
     bitWrite(sknow, vari, 1);
     i1[st]--;
@@ -165,7 +171,6 @@ void useItem(byte st) {
     readScroll(vari);
     if (stab[vari] != 4) {
       itmToGitm(6, vari, 1);
-      addBuf(gitm);
     }
   } else if (kind == 7) {     //ring
     bitWrite(rknow, vari, 1);
@@ -208,7 +213,7 @@ void wakeUp() {
 }
 
 byte strToDmg(byte str) {
-  byte result;
+  byte result = 0;
   if (str >= 1 && str <= 5) {
     result = str - 5;
   } else if (str >= 6 && str <= 14) {
@@ -318,10 +323,10 @@ void throwItem(byte i) {    //i=pack num 0 to 19
         }
       }
     } else {
-      mess(9);
+      setActiveMessage(9);
     }
   } else {
-    mess(12);
+    setActiveMessage(12);
   }
 }
 
@@ -407,7 +412,7 @@ byte askDir() {
   drawThing();
   drawMonst();
   //  msgc="dir?";
-  mess(5);
+  setActiveMessage(5);
   showMsg();
   arduboy.display();
 

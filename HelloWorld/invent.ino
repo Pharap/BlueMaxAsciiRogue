@@ -1,3 +1,6 @@
+#include "strings.h"
+#include "FlashStringHelper.h"
+
 byte inputWait() {
   byte result = 0;
   do {
@@ -21,14 +24,14 @@ void drawInventry(byte st, byte mode) {
     arduboy.setTextColor(BLACK);
     arduboy.print(F(" Inventory     "));
     arduboy.print( hh );
-    arduboy.print(F("  "));
+    arduboy.print(asFlashStringHelper(blankString));
   } else {
     arduboy.print(F(" which?"));
   }
   locate(0, 1);
   arduboy.setTextBackground(BLACK);
   arduboy.setTextColor(WHITE);
-  arduboy.print(F(">"));
+  arduboy.print('>');
 
   if (st + 7 > im) {
     ed = im;
@@ -51,7 +54,7 @@ void drawInventry(byte st, byte mode) {
         arduboy.print(i1[i]);
         arduboy.print(F(" "));
         itmToGitm(ii[i]/16,kind,0);
-        arduboy.print(gitm);
+        arduboy.print(activeMessage);
         break;
       case 3:
         if(kind>=4){
@@ -59,13 +62,13 @@ void drawInventry(byte st, byte mode) {
           arduboy.print(F(" "));
         }
         itmToGitm(ii[i]/16,kind,0);
-        arduboy.print(gitm);
+        arduboy.print(activeMessage);
         if(bitRead(i4[i],5)==1){
-          arduboy.print(F("["));
+          arduboy.print('[');
           arduboy.print((int)i2[i]);
           arduboy.print(F(","));
           arduboy.print((int)i3[i]);
-          arduboy.print(F("]"));
+          arduboy.print(']');
         }
         if(bitRead(i4[i],6)==1){
           arduboy.print(F(" C"));
@@ -76,11 +79,11 @@ void drawInventry(byte st, byte mode) {
         break;
       case 4:
         itmToGitm(ii[i]/16,kind,0);
-        arduboy.print(gitm);
+        arduboy.print(activeMessage);
         if(bitRead(i4[i],5)==1){
-          arduboy.print(F("["));
+          arduboy.print('[');
           arduboy.print((int)i2[i]);
-          arduboy.print(F("]"));
+          arduboy.print(']');
         }
         if(bitRead(i4[i],6)==1){
           arduboy.print(F(" C"));
@@ -97,7 +100,7 @@ void drawInventry(byte st, byte mode) {
         } else {
           itmToGitm(ii[i]/16,kind,1);
         }
-        arduboy.print(gitm);
+        arduboy.print(activeMessage);
         break;
       case 6:
         arduboy.print(i1[i]);
@@ -107,7 +110,7 @@ void drawInventry(byte st, byte mode) {
         } else {
           itmToGitm(ii[i]/16,kind,1);
         }
-        arduboy.print(gitm);
+        arduboy.print(activeMessage);
         break;
       case 7:
         if(bitRead(rknow,kind)==0){
@@ -115,12 +118,12 @@ void drawInventry(byte st, byte mode) {
         } else {
           itmToGitm(ii[i]/16,kind,1);
         }
-        arduboy.print(gitm);
+        arduboy.print(activeMessage);
         if(bitRead(i4[i],5)==1){
           if(i2[i] != 0){
-            arduboy.print(F("["));
+            arduboy.print('[');
             arduboy.print((int)i2[i]);
-            arduboy.print(F("]"));
+            arduboy.print(']');
           }
         }
         if(bitRead(i4[i],6)==1){
@@ -136,16 +139,16 @@ void drawInventry(byte st, byte mode) {
         } else {
           itmToGitm(ii[i]/16,kind,1);
         }
-        arduboy.print(gitm);
+        arduboy.print(activeMessage);
         if(bitRead(i4[i],5)==1){
-          arduboy.print(F("["));
+          arduboy.print('[');
           arduboy.print((int)i2[i]);
-          arduboy.print(F("]"));
+          arduboy.print(']');
         }
         break;
       case 9:
         itmToGitm(ii[i]/16,kind,1);
-        arduboy.print(gitm);
+        arduboy.print(activeMessage);
         break;
     }
   }
@@ -185,11 +188,11 @@ byte inventry(byte mode) {
       if(mode==0){
         ex = action(st);
       } else {
-        ex=1;
+		break;
       }
     }
     if (a == 6) {
-      ex = 1;
+      break;
     }
   } while (ex == 0);
   return st;
@@ -218,7 +221,7 @@ byte action(byte st) {
 //  arduboy.print(ii[st] % 16);
 //  arduboy.print(F("   "));
   locate(1, curs + 2);
-  arduboy.print(F("> "));
+  arduboy.print(asFlashStringHelper(selectorString));
 
   arduboy.display();
   byte ex = 0;
@@ -228,20 +231,20 @@ byte action(byte st) {
       case 2:
         if (curs > 0) {
           locate(1, curs + 2);
-          arduboy.print(F("  "));
+          arduboy.print(asFlashStringHelper(blankString));
           curs--;
           locate(1, curs + 2);
-          arduboy.print(F("> "));
+          arduboy.print(asFlashStringHelper(selectorString));
           arduboy.display();
         }
         break;
       case 4:
         if (curs < 2) {
           locate(1, curs + 2);
-          arduboy.print(F("  "));
+          arduboy.print(asFlashStringHelper(blankString));
           curs++;
           locate(1, curs + 2);
-          arduboy.print(F("> "));
+          arduboy.print(asFlashStringHelper(selectorString));
           arduboy.display();
         }
         break;
@@ -249,23 +252,23 @@ byte action(byte st) {
         if(curs==0){
           useItem(st);
           sortItem();
-          ex=1;
+          return 1;
         } else if(curs==1){
           throwItem(st);
           sortItem();
-          ex=1;
+          return 1;
         } else if(curs==2){
           dropItem(hx, hy, st);
           sortItem();
-          ex=1;
+          return 1;
         } else if(curs==3){
           saveStatus();
           gstate=2;
-          ex=1;
+          return 1;
         }
         break;
       case 6:
-        ex = 1;
+        return 1;
         break;
     }
   } while (ex == 0);
@@ -301,12 +304,12 @@ void showStatus() {
   locate(h, 3);
   arduboy.print(F("Hp:"));
   arduboy.print(hp);
-  arduboy.print(F("/"));
+  arduboy.print('/');
   arduboy.print(hpm);
   locate(h, 4);
   arduboy.print(F("St:"));
   arduboy.print(st);
-  arduboy.print(F("/"));
+  arduboy.print('/');
   arduboy.print(stm);
   locate(h, 5);
   arduboy.print(F("AC:"));
@@ -321,7 +324,7 @@ void showStatus() {
   locate(h, 6);
   arduboy.print(F("Ex:"));
   arduboy.print(lv);
-  arduboy.print(F("/"));
+  arduboy.print('/');
   locate(h + 3, 7);
   arduboy.print(ex);
 }

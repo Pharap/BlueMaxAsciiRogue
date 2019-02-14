@@ -209,29 +209,29 @@ void moveMonst() {
 /*
     } else if (ms[i]%16==21 && dungeon[mx[i]][my[i]]%10 == dungeon[hx][hy]%10 && bitRead(m1[i],3)==1){
       flashHero();
-      mess(18);
+      setActiveMessage(18);
       hhall=10;
       bitWrite(m1[i],3,0);
     } else if (ms[i]%16==25 && canBless() != 0){
       flashHero();
-      mess(19);
+      setActiveMessage(19);
       //dragon's damage
 */
     } else {
       byte fly = bitRead(m1[i], 7) + 1;
       for (int tt = 0; tt < fly; tt++) {
-        int r;  //= random(4);
+        int r = 0;  //= random(4);
         if (ms[i] / 32 >= 2) {
           r = 5;
         } else if (ms[i]%32==21 && dungeon[hx][hy] != 8 &&
             dungeon[mx[i]][my[i]]%10 == dungeon[hx][hy]%10 && bitRead(m1[i],3)==1){
           flashHero();
-          mess(18);
+          setActiveMessage(18);
           hconf=10;
           bitWrite(m1[i],3,0);
         } else if (ms[i]%32==25 && canBless() > 0 && random(2)==0){
           flashHero();
-          mess(19);
+          setActiveMessage(19);
 //          Serial.println(F("im dragon,i wanna bless"));
         } else {
           if (mx[i] > hx && monst[mx[i] - 1][my[i]] == 0
@@ -349,7 +349,7 @@ void showMsg() {
   } else {
     locate(0, 7);
   }
-  arduboy.print(gbuf);
+  arduboy.print(activeMessage);
 }
 
 void placeThing() {
@@ -539,7 +539,7 @@ void checkThing(byte x, byte y) {
   } else {
     byte type = id[thing[x][y] - 1] / 16;
     byte r = id[thing[x][y] - 1] % 16;
-    byte k;
+    byte k = 0;
 
     switch (type) {
       case 1:
@@ -563,7 +563,6 @@ void checkThing(byte x, byte y) {
         break;
     }
     itmToGitm(type, r, k);
-    addBuf(gitm);
     byte done = 0;
     if (id[thing[x][y] - 1] == 16) {
       au = au + t1[thing[x][y] - 1];
@@ -600,7 +599,7 @@ void checkThing(byte x, byte y) {
       }
       if (done == 0) {
         if (im == IMAX) {
-          mess(2);
+          setActiveMessage(2);
         } else {
           ii[im] = id[thing[x][y] - 1];
           i1[im] = t1[thing[x][y] - 1];
@@ -624,51 +623,41 @@ void checkThing(byte x, byte y) {
   }
 }
 
-void deleteThing(byte i){
-  id[i] = 0;
-  t1[i] = 0;
-  t2[i] = 0;
-  t3[i] = 0;
-  t4[i] = 0;
+void deleteThing(byte i)
+{
+	id[i] = 0;
+	t1[i] = 0;
+	t2[i] = 0;
+	t3[i] = 0;
+	t4[i] = 0;
 }
 
-byte initState(byte mon) {
-  byte result;
-  byte state = pgm_read_byte(mstat[mon] + 6) % 16;
-  switch (state) {
-    case 1:
-      result = 1;
-      break;
-    case 2:
-      result = 2;
-      break;
-    case 3:
-      if (random(5) == 0) {
-        result = 2;
-      } else {
-        result = 1;
-      }
-      break;
-    case 4:
-      result = 4;
-      break;
-    case 5:
-      if (random(5) == 0) {
-        result = 4;
-      } else {
-        result = 1;
-      }
-      break;
-    case 6:       //for mimic
-      result = 3;
-  }
-  return result;
+byte initState(byte mon)
+{
+	byte state = pgm_read_byte(mstat[mon] + 6) % 16;
+	switch (state)
+	{
+		case 3:
+			if (random(5) == 0)
+				return 2;
+			else
+				return 1;
+		case 5:
+			if (random(5) == 0)
+				return 4;
+			else
+				return 1;
+		case 6:
+			return 3;
+		default:
+			return state;
+	}
 }
 
 void tweatHero() {
   ht++;
   if (ex >= nl) {   //level up
-    mess(6);
+    setActiveMessage(6);
     lv++;
     nl = nl * 2;
     byte r2 = random(8) + 3;
